@@ -68,6 +68,8 @@ EOF
         ;;
     esac
     ufw allow from $extIP to any > /dev/null 2>&1
+    ufw allow from 10.0.0.0/8 > /dev/null 2>&1  # Allows Internal IP space just in case. . .
+    hide_from_scanners 
     ufw allow 80/tcp > /dev/null 2>&1
     ufw allow 443/tcp > /dev/null 2>&1
     update-rc.d ufw enable > /dev/null 2>&1
@@ -75,7 +77,14 @@ EOF
     echo "The System will now reboot!"
     reboot
 }
-
+function hide_from_scanners() {
+    # UFW Deny from Censys.io Scanners:  https://support.censys.io/hc/en-us/articles/360043177092-Opt-Out-of-Data-Collection
+    ufw deny from 162.142.125.0/24 > /dev/null 2>&1
+    ufw deny from 167.94.138.0/24 > /dev/null 2>&1
+    ufw deny from 167.94.145.0/24 > /dev/null 2>&1
+    ufw deny from 167.94.146.0/24 > /dev/null 2>&1
+    ufw deny from 167.248.133.0/24 > /dev/null 2>&1
+}
 function reset_firewall() {
     apt-get install iptables-persistent -q -y > /dev/null 2>&1
 
